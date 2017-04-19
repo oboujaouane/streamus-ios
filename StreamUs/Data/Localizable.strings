@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  StreamUs
+
+  Created by Ousama Boujaouane on 19/04/2017.
+  Copyright © 2017 Ousama Boujaouane. All rights reserved.
+*/
+
+"streamUrl" = "https://wowza-cloudfront.streamroot.io/liveorigin/stream4/playlist.m3u8";
+"retry" = "Retry";
+"unknownStatus" = "status unknown: Player item is not yet ready.";
+"logFileName" = "/log.txt";
+"unabletoReadFile" = "Unable to read file";

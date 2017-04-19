@@ -70,9 +70,12 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vGo-N9-c6S">
-                                        <rect key="frame" x="8" y="84" width="63" height="30"/>
-                                        <state key="normal" title="Show log"/>
+                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vGo-N9-c6S">
+                                        <rect key="frame" x="126.5" y="84" width="67" height="30"/>
+                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                        <state key="normal" title="Show log">
+                                            <color key="titleColor" red="0.2274509804" green="0.62745098040000002" blue="0.82745098039999998" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="showLogView:" destination="R22-XA-oT9" eventType="touchUpInside" id="1Rf-Az-rtu"/>
                                         </connections>
@@ -81,8 +84,8 @@
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="PMx-Fm-MT7" secondAttribute="trailing" id="1da-bJ-eHy"/>
+                                    <constraint firstItem="vGo-N9-c6S" firstAttribute="centerX" secondItem="SSJ-xq-5QR" secondAttribute="centerX" id="4Oh-9n-cbb"/>
                                     <constraint firstItem="PMx-Fm-MT7" firstAttribute="top" secondItem="SSJ-xq-5QR" secondAttribute="top" id="7vy-DX-YRJ"/>
-                                    <constraint firstItem="vGo-N9-c6S" firstAttribute="leading" secondItem="SSJ-xq-5QR" secondAttribute="leading" constant="8" id="BM2-5W-t2i"/>
                                     <constraint firstItem="Wfo-V7-eJf" firstAttribute="top" secondItem="SSJ-xq-5QR" secondAttribute="top" constant="8" id="EMC-iU-6YS"/>
                                     <constraint firstAttribute="bottom" secondItem="PMx-Fm-MT7" secondAttribute="bottom" id="JwR-np-jsc"/>
                                     <constraint firstItem="e3V-VE-hEt" firstAttribute="top" secondItem="SSJ-xq-5QR" secondAttribute="top" constant="8" id="Rlt-d5-DZq"/>

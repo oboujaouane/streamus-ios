@@ -12,7 +12,7 @@ import AVFoundation
 import ResponseDetective
 
 class HomeViewController: UIViewController, LogViewDelegate {
-    
+    // MARK: IBOutlets
     @IBOutlet weak var playStreamButton: UIButton!
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var infoLabel: UILabel!
@@ -21,17 +21,14 @@ class HomeViewController: UIViewController, LogViewDelegate {
     @IBOutlet weak var playerView: UIView!
     @IBOutlet weak var playerButtonsView: UIView!
     @IBOutlet weak var logView: LogView!
+    // MARK: Let(s) & Var(s)
     let playerController = AVPlayerViewController()
     var timer = Timer()
     var streamUrl: URL?
     var pathForLog = String()
     var playerItem: AVPlayerItem?
     var playerStatusObservingContext = UnsafeMutablePointer<Int>(bitPattern: 1)
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent //change status bar text to white color
-    }
-    
+    // MARK: LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -41,6 +38,51 @@ class HomeViewController: UIViewController, LogViewDelegate {
         // Resize and center View
         self.logView.frame = self.view.frame
         self.logView.logTextView.center = CGPoint(x: self.view.bounds.midX, y: self.view.bounds.midY)
+    }
+    // MARK: IBActions
+    @IBAction func playVideoAction(_ sender: UIButton) { // called when 'Start streaming' button is touched
+        self.setupPlayer()
+    }
+    
+    @IBAction func playPauseAction(sender: UIButton!) { // called when 'Play/Pause' button is touched
+        switch sender.tag {
+        case 1:
+            self.playerController.player?.pause()
+            self.playStopButton.setImage(#imageLiteral(resourceName: "Play"), for: .normal)
+            self.playStopButton.tag = 2
+        case 2:
+            self.playStopButton.setImage(#imageLiteral(resourceName: "Stop"), for: .normal)
+            self.playerController.player?.play()
+            self.playStopButton.tag = 1
+        case 3:
+            self.playerItem?.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &self.playerStatusObservingContext)
+            self.playerController.removeFromParentViewController()
+            self.playStopButton.tag = 1
+            self.playStopButton.setTitle(nil, for: .normal)
+            self.playStopButton.setImage(#imageLiteral(resourceName: "Stop"), for: .normal)
+            self.setupPlayer()
+        default:
+            self.playerController.player?.pause()
+            self.playStopButton.setImage(#imageLiteral(resourceName: "Play"), for: .normal)
+            self.playStopButton.tag = 2
+        }
+    }
+    
+    @IBAction func showLogView(_ showLogButton: UIButton) { // called when 'Show log' button is touched and shows content of log.txt file every second
+        self.showContentFile()
+        self.view.addSubview(self.logView)
+        self.timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self.showContentFile), userInfo: nil, repeats: true)
+    }
+    // MARK: Funcs
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .lightContent //change status bar text to white color
+    }
+    
+    func redirectLogToDocuments() {
+        let allPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        let documentsDirectory: NSString = allPaths.first! as NSString
+        self.pathForLog = documentsDirectory.appending(NSLocalizedString("logFileName", comment: ""))
+        freopen(pathForLog.cString(using: String.Encoding.ascii)!, "a+", stderr)
     }
     
     func uiHidden(_ isHidden: Bool) {
@@ -53,18 +95,16 @@ class HomeViewController: UIViewController, LogViewDelegate {
         self.timer.invalidate()
     }
     
-    // rename with setupPlayer func
-    func prepareToPlay() {
+    func setupPlayer() {
         self.uiHidden(true)
         // in strings file
-        self.streamUrl = URL(string: "https://wowza-cloudfront.streamroot.io/liveorigin/stream4/playlist.m3u8")!
+        self.streamUrl = URL(string: NSLocalizedString("streamUrl", comment: ""))!
         // Create asset to be played
         let asset = AVAsset(url: self.streamUrl!)
         let assetKeys = [
             "playable",
             "hasProtectedContent"
         ]
-        
         // Create a new AVPlayerItem with the asset and an asset keys to be automatically loaded
         self.playerItem = AVPlayerItem(asset: asset,
                                        automaticallyLoadedAssetKeys: assetKeys)
@@ -82,7 +122,7 @@ class HomeViewController: UIViewController, LogViewDelegate {
         let closePlayerButton = UIButton(type: UIButtonType.custom)
         closePlayerButton.frame = CGRect(x: 4, y: 30, width: 24, height: 24)
         closePlayerButton.setImage(#imageLiteral(resourceName: "Close"), for: .normal)
-        closePlayerButton.addTarget(self, action: #selector(closePlayer), for:.touchUpInside)
+        closePlayerButton.addTarget(self, action: #selector(self.closePlayer), for:.touchUpInside)
         self.playerController.view.addSubview(closePlayerButton)
         self.playerView.addSubview(self.playerController.view)
         self.playerController.player?.play()
@@ -98,26 +138,17 @@ class HomeViewController: UIViewController, LogViewDelegate {
         })
     }
     
-    // called when close button in player touched
-    func closePlayer() {
+    func closePlayer() { // called when close button in player is touched
         DispatchQueue.main.async() {
             self.playerController.player?.pause()
             self.playerItem?.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &self.playerStatusObservingContext)
             self.playerController.removeFromParentViewController()
             self.playerController.view.removeFromSuperview()
         }
+        self.playStopButton.tag = 1
+        self.playStopButton.setImage(#imageLiteral(resourceName: "Stop"), for: .normal)
         self.uiHidden(true)
-    }
-    
-    @IBAction func playVideoAction(_ sender: UIButton) {
-        self.prepareToPlay()
-    }
-    
-    @IBAction func showLogView(_ showLogButton: UIButton) {
-        self.showContentFile()
-        self.view.addSubview(self.logView)
-        // show content of log.txt file every second
-        self.timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(self.showContentFile), userInfo: nil, repeats: true)
+        self.showLogButton.isHidden = true
     }
     
     func showContentFile() {
@@ -142,32 +173,8 @@ class HomeViewController: UIViewController, LogViewDelegate {
             let lines:String =  NSString(string: trimmed) as String
             return lines
         } catch {
-            print("Unable to read file: \(path)");
+            print("\(NSLocalizedString("unabletoReadFile", comment: "")): \(path)")
             return String()
-        }
-    }
-    
-    @IBAction func playPauseAction(sender: UIButton!) {
-        switch sender.tag {
-        case 1:
-            self.playerController.player?.pause()
-            self.playStopButton.setImage(#imageLiteral(resourceName: "Play"), for: .normal)
-            self.playStopButton.tag = 2
-        case 2:
-            self.playStopButton.setImage(#imageLiteral(resourceName: "Stop"), for: .normal)
-            self.playerController.player?.play()
-            self.playStopButton.tag = 1
-        case 3:
-            self.playerItem?.removeObserver(self, forKeyPath: #keyPath(AVPlayerItem.status), context: &self.playerStatusObservingContext)
-            self.playerController.removeFromParentViewController()
-            self.playStopButton.tag = 1
-            self.playStopButton.setTitle(nil, for: .normal)
-            self.playStopButton.setImage(#imageLiteral(resourceName: "Stop"), for: .normal)
-            self.prepareToPlay()
-        default:
-            self.playerController.player?.pause()
-            self.playStopButton.setImage(#imageLiteral(resourceName: "Play"), for: .normal)
-            self.playStopButton.tag = 2
         }
     }
     
@@ -198,23 +205,16 @@ class HomeViewController: UIViewController, LogViewDelegate {
             case .readyToPlay:
                 // Player item is ready to play.
                 self.uiHidden(false)
+                self.showLogButton.isHidden = false
             case .failed:
                 // Player item failed.
                 self.playStopButton.tag = 3
                 self.playStopButton.setImage(nil, for: .normal)
-                self.playStopButton.setTitle("Retry", for: .normal)
+                self.playStopButton.setTitle(NSLocalizedString("retry", comment: ""), for: .normal)
                 self.playStopButton.isHidden = false
             case .unknown:
-                // Player item is not yet ready.
-                print("unknown")
+                print(NSLocalizedString("unknownStatus", comment: ""))
             }
         }
-    }
-    
-    func redirectLogToDocuments() {
-        let allPaths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
-        let documentsDirectory: NSString = allPaths.first! as NSString
-        self.pathForLog = documentsDirectory.appending("/log.txt")
-        freopen(pathForLog.cString(using: String.Encoding.ascii)!, "a+", stderr)
     }
 }
