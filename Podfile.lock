@@ -1,0 +1,12 @@
+PODS:
+  - ResponseDetective (1.0.1)
+
+DEPENDENCIES:
+  - ResponseDetective
+
+SPEC CHECKSUMS:
+  ResponseDetective: 23e249af05e588506e23b7adf2fbe8360f3cd1d7
+
+PODFILE CHECKSUM: 112f1f22a1f27692f7c83a732d7ffddb9022ada3
+
+COCOAPODS: 1.2.1
