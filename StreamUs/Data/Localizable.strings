@@ -11,3 +11,4 @@
 "unknownStatus" = "status unknown: Player item is not yet ready.";
 "logFileName" = "/log.txt";
 "unabletoReadFile" = "Unable to read file";
+ok = "Ok";
