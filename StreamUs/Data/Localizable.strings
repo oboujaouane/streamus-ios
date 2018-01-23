@@ -12,5 +12,5 @@
 "logFileName" = "/log.txt";
 "unabletoReadFile" = "Unable to read file";
 ok = "Ok";
-newKey = "just for test"
-
+newKey = "just for test";
+newKey2 = "just for test 2";
